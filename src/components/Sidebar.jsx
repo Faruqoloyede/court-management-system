@@ -1,0 +1,95 @@
+// components/Sidebar.jsx
+import {
+  FiHome,       // Dashboard
+  FiFolder,     // Cases
+  FiUsers,      // Clients
+  FiX           // Close
+} from "react-icons/fi";
+import { Link } from "react-router-dom";
+
+const Sidebar = ({ sidebarOpen, setSidebarOpen, activePage, setActivePage }) => {
+  const navigationItems = [
+    { name: "Dashboard", to: '/dashboard', icon: <FiHome className="h-5 w-5" /> },
+    { name: "Cases", to: '/cases', icon: <FiFolder className="h-5 w-5" /> },
+    { name: "Add Case", to: '/addcase', icon: <FiUsers className="h-5 w-5" /> },
+  ];
+
+  return (
+    <>
+      {/* Sidebar Backdrop */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-gray-900 bg-opacity-50 z-20 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        ></div>
+      )}
+
+      {/* Sidebar */}
+      <div
+        className={`fixed inset-y-0 left-0 z-30 w-64 bg-blue-900 transform transition duration-300 ease-in-out lg:relative lg:translate-x-0 ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="flex items-center justify-between h-16 px-4 bg-blue-900 border-b border-blue-800">
+          <div className="flex items-center">
+            <div className="flex-shrink-0 flex items-center">
+              <div className="h-8 w-8 bg-white rounded-md flex items-center justify-center mr-2">
+                <FiHome className="h-6 w-6 text-blue-900" />
+              </div>
+              <span className="text-white text-xl font-semibold">
+                CourtDocs
+              </span>
+            </div>
+          </div>
+          <button
+            className="text-blue-200 hover:text-white lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          >
+            <FiX className="h-6 w-6" />
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto">
+          <nav className="mt-5 px-2 space-y-1">
+            {navigationItems.map((item) => (
+              <Link
+                key={item.name}
+                to={item.to}
+                className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors ${
+                  activePage === item.name
+                    ? "bg-blue-800 text-white"
+                    : "text-blue-100 hover:bg-blue-800 hover:text-white"
+                }`}
+                onClick={() => {
+                  setActivePage(item.name);
+                  setSidebarOpen(false);
+                }}
+              >
+                {item.icon}
+                <span className="ml-3">{item.name}</span>
+              </Link>
+            ))}
+          </nav>
+        </div>
+
+        <div className="flex-shrink-0 flex border-t border-blue-800 p-4">
+          <div className="flex items-center w-full">
+            <div className="flex-shrink-0">
+              <img
+                className="h-10 w-10 rounded-full"
+                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                alt="User profile"
+              />
+            </div>
+            <div className="ml-3">
+              <p className="text-sm font-medium text-white">John Attorney</p>
+              <p className="text-xs font-medium text-blue-200">View profile</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default Sidebar;
