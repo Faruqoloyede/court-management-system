@@ -1,11 +1,15 @@
 // components/Sidebar.jsx
+import { signOut } from "firebase/auth";
 import {
   FiHome,       // Dashboard
   FiFolder,     // Cases
   FiUsers,      // Clients
-  FiX           // Close
+  FiX ,
+  FiLogOut          // Close
 } from "react-icons/fi";
+import { auth } from "../lib/firebase";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen, activePage, setActivePage }) => {
   const navigationItems = [
@@ -14,6 +18,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, activePage, setActivePage }) => 
     { name: "Add Case", to: '/addcase', icon: <FiUsers className="h-5 w-5" /> },
   ];
 
+  const navigate = useNavigate();
+
+  const handleLogout = async()=>{
+    await signOut(auth);
+    navigate('/');
+  }
   return (
     <>
       {/* Sidebar Backdrop */}
@@ -55,7 +65,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, activePage, setActivePage }) => 
               <Link
                 key={item.name}
                 to={item.to}
-                className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors ${
+                className={`group flex items-center px-2 py-2 mb-10 text-sm font-medium rounded-md transition-colors ${
                   activePage === item.name
                     ? "bg-blue-800 text-white"
                     : "text-blue-100 hover:bg-blue-800 hover:text-white"
@@ -69,23 +79,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, activePage, setActivePage }) => 
                 <span className="ml-3">{item.name}</span>
               </Link>
             ))}
+            <span onClick={handleLogout} className="text-blue-100 hover:bg-blue-800 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
+              <FiLogOut className="h-5 w-5" />
+              <button className="ml-3">Logout</button>
+            </span>
           </nav>
-        </div>
-
-        <div className="flex-shrink-0 flex border-t border-blue-800 p-4">
-          <div className="flex items-center w-full">
-            <div className="flex-shrink-0">
-              <img
-                className="h-10 w-10 rounded-full"
-                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                alt="User profile"
-              />
-            </div>
-            <div className="ml-3">
-              <p className="text-sm font-medium text-white">John Attorney</p>
-              <p className="text-xs font-medium text-blue-200">View profile</p>
-            </div>
-          </div>
         </div>
       </div>
     </>

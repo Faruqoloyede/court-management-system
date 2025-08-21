@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
+import { collection, getDocs, deleteDoc, doc, query, orderBy } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { FaPlus, FaSearch, FaTrash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -9,10 +9,11 @@ const CaseList = ({ activePage }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
-  // Fetch cases from Firestore
+  // Fetch cases from Firestore (newest first)
   useEffect(() => {
     const fetchCases = async () => {
-      const querySnapshot = await getDocs(collection(db, "cases"));
+      const q = query(collection(db, "cases"), orderBy("createdAt", "desc")); // ✅ order by newest
+      const querySnapshot = await getDocs(q);
       const caseList = querySnapshot.docs.map((docSnap) => ({
         id: docSnap.id,
         ...docSnap.data(),
@@ -35,6 +36,20 @@ const CaseList = ({ activePage }) => {
       caseItem.caseNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       caseItem.parties?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // ✅ Status color function
+  const getStatusClass = (status) => {
+    switch ((status || "").toLowerCase()) {
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "ongoing":
+        return "bg-blue-100 text-blue-800";
+      case "completed":
+        return "bg-green-100 text-green-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -76,22 +91,18 @@ const CaseList = ({ activePage }) => {
             </thead>
             <tbody>
               {filteredCases.length > 0 ? (
-                filteredCases.map((c) => (
+                filteredCases.map((c, index) => (
                   <tr
                     key={c.id}
-                    className="border-b hover:bg-gray-50 cursor-pointer"
-                    onClick={() => navigate(`/cases/${c.id}`)} // ✅ navigate by Firestore ID
+                    className={`${index % 2 === 0 ? "bg-gray-50" : "bg-white"} hover:bg-gray-100 cursor-pointer`}
+                     // ✅ navigate by Firestore ID
                   >
-                    <td className="px-6 py-4">{c.caseNumber}</td>
+                    <td className="px-6 py-4" onClick={() => navigate(`/cases/${c.id}`)}>{c.caseNumber}</td>
                     <td className="px-6 py-4">{c.parties}</td>
                     <td className="px-6 py-4">{c.judge}</td>
                     <td className="px-6 py-4">
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          c.status === "Pending"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-green-100 text-green-800"
-                        }`}
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusClass(c.status)}`}
                       >
                         {c.status || "Pending"}
                       </span>

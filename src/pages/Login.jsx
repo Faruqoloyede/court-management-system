@@ -11,6 +11,7 @@ import {
   Warning,
   VpnKey
 } from '@mui/icons-material';
+import { toast } from 'react-toastify';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -27,6 +28,7 @@ export default function Login() {
     
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      toast.success('Login successful!');
       navigate('/dashboard');
     } catch (err) {
       setError(err.message);
