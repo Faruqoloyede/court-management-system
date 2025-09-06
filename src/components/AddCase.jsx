@@ -58,6 +58,20 @@ const AddCase = () => {
     e.preventDefault();
     setUploading(true);
 
+     const caseNumberPattern = /^[A-Z]{2}-\d{4}-\d{4}$/;
+  if (!caseNumberPattern.test(caseData.caseNumber)) {
+    toast.error("Case Number must be in the format CR-2023-0456");
+    return;
+  }
+
+  const judgePattern = /^[A-Za-z\s]+$/;
+  if (!judgePattern.test(caseData.judge)) {
+    toast.error("Judge name must contain only letters and spaces");
+    return;
+  }
+
+  setUploading(true);
+
     try {
       const fileUrls = [];
 
